@@ -13,8 +13,12 @@ from pyspark.sql import functions as F
 def trips_silver():
     df_bronze = spark.readStream.option("ignoreDeletes", "true").table("trips.bronze.trips")
     
-    # Filter out rows with null key columns
-    df_bronze = df_bronze.filter(F.col("trip_id").isNotNull() & F.col("date").isNotNull())
+    # Filter out rows with null key columns (including city_id)
+    df_bronze = df_bronze.filter(
+        F.col("trip_id").isNotNull() & 
+        F.col("date").isNotNull() & 
+        F.col("city_id").isNotNull()
+    )
 
     df_silver = df_bronze.select(
         F.col("trip_id").alias("id"),
